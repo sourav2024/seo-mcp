@@ -1,20 +1,93 @@
 {
-  "name": "seo-mcp",
+  "name": "technical-seo-mcp",
   "version": "1.0.0",
-  "description": "Technical SEO audit MCP server",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "MCP server for technical & on-page SEO audits — crawlability, HTTPS, Core Web Vitals, sitemap, robots.txt, structured data, and AI-crawler access. Reports as Markdown, JSON, or a shareable HTML file.",
   "type": "module",
   "bin": {
-    "seo-mcp": "./server.js"
+    "seo-mcp": "./server.js",
+    "technical-seo-mcp": "./server.js"
+  },
+  "exports": {
+    ".": "./server.js",
+    "./checks": "./checks/index.js",
+    "./checks/*": "./checks/*.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "server.js",
+    "server.json",
+    "checks/",
+    "src/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    ".env.example"
+  ],
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test \"test/**/*.test.js\"",
+    "test:watch": "node --test --watch \"test/**/*.test.js\"",
+    "test:coverage": "node --test --experimental-test-coverage \"test/**/*.test.js\"",
+    "lint": "prettier --check . && markdownlint-cli2",
+    "format": "prettier --write .",
+    "build": "echo \"No build step — plain ESM, runs directly on Node 20+\" && node --check server.js",
+    "verify": "npm run lint && npm test && npm run smoke",
+    "smoke": "node scripts/smoke.js",
+    "prepublishOnly": "npm run check:placeholders && npm test",
+    "lint:md": "markdownlint-cli2",
+    "check:placeholders": "node scripts/check-placeholders.js"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "modelcontextprotocol",
+    "model-context-protocol",
+    "claude",
+    "claude-code",
+    "seo",
+    "technical-seo",
+    "seo-audit",
+    "on-page-seo",
+    "lighthouse",
+    "core-web-vitals",
+    "sitemap",
+    "robots-txt",
+    "structured-data",
+    "json-ld",
+    "schema-org",
+    "crawler",
+    "site-audit",
+    "llms-txt",
+    "ai-crawlers"
+  ],
+  "author": "sourav2024 (https://github.com/sourav2024)",
+  "license": "MIT",
+  "homepage": "https://github.com/sourav2024/seo-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sourav2024/seo-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sourav2024/seo-mcp/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/sourav2024"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.23.1",
+    "prettier": "^3.4.2"
   }
 }

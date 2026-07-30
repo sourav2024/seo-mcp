@@ -1,0 +1,129 @@
+name: Bug report
+description: Something is broken or a check reports the wrong result
+title: "[bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. A reproducible case — ideally a public URL — is the
+        single most useful thing you can include.
+
+        **Security issue?** Do not file it here. Use a
+        [private advisory](https://github.com/sourav2024/seo-mcp/security/advisories/new).
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I checked the [troubleshooting section](https://github.com/sourav2024/seo-mcp#troubleshooting)
+          required: true
+        - label: I searched existing issues for a duplicate
+          required: true
+        - label: I am on the latest version (`npx technical-seo-mcp --version`)
+          required: false
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you observe, and what did you expect instead?
+      placeholder: |
+        check_sitemap reported "sitemap.xml not found", but https://example.com/sitemap.xml
+        returns 200 in a browser.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the tool you called and its arguments.
+      placeholder: |
+        1. Asked the client: "check the sitemap on example.com"
+        2. Tool called: check_sitemap with { "url": "https://example.com" }
+        3. Result: ❌ No /sitemap.xml found (HTTP 404)
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Audited URL
+      description: If the site is public, the URL makes this reproducible. Leave blank if private.
+      placeholder: https://example.com/some-page
+    validations:
+      required: false
+
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Which tool
+      options:
+        - seo_full_audit
+        - crawl_audit
+        - check_rendering
+        - check_https
+        - check_url_structure
+        - check_page_essentials
+        - check_caching
+        - check_sitemap
+        - check_robots
+        - check_keyword_placement
+        - check_structured_data
+        - check_ai_crawlers
+        - run_lighthouse
+        - "Server startup / connection (no tool ran)"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug logs
+      description: |
+        Re-run with `SEO_MCP_LOG_LEVEL=debug` and `SEO_MCP_LOG_FORMAT=text`, then paste
+        the server's stderr output. **Remove anything sensitive first.**
+      render: shell
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: technical-seo-mcp version
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version
+      description: Output of `node --version` (must be 20.10+)
+      placeholder: v20.11.0
+    validations:
+      required: true
+
+  - type: input
+    id: client
+    attributes:
+      label: MCP client
+      placeholder: Claude Code 1.2.3 / Claude Desktop / Cursor
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - "Windows (WSL)"
+        - Docker
+    validations:
+      required: true

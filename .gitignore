@@ -1,2 +1,18 @@
 node_modules/
+
+# Generated HTML reports (output: "html" writes these into the CWD by default)
+seo-report-*.html
+seo-crawl-*.html
+
+# Legacy baseline location (pre-1.0.0); baselines now live in the OS state dir
 .seo-audit-baseline.json
+.seo-baselines/
+
+# Local env overrides — .env.example is the committed template
+.env
+.env.local
+
+# Packaging / tooling artifacts
+*.tgz
+coverage/
+.DS_Store
