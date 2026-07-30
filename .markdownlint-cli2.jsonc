@@ -1,0 +1,13 @@
+{
+  // Prettier owns formatting (printWidth 120) and reflows prose and tables;
+  // markdownlint checks structure and link validity only, so the rules Prettier
+  // already governs are disabled to avoid two tools disagreeing.
+  "config": {
+    "MD013": false, // line-length — Prettier's printWidth is the source of truth
+    "MD033": false, // inline HTML — occasionally needed for image sizing
+    "MD024": { "siblings_only": true }, // repeated headings are fine across sections
+    "MD041": false, // first line need not be a top-level heading (badges block)
+  },
+  "globs": ["**/*.md"],
+  "ignores": ["node_modules/**", "CHANGELOG.md"],
+}

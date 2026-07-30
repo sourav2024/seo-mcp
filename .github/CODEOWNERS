@@ -1,0 +1,10 @@
+# Default owner for everything in this repository.
+* @sourav2024
+
+# Security-sensitive modules: URL validation, subprocess spawning, and the
+# report renderer that escapes untrusted page content.
+/src/url-guard.js @sourav2024
+/checks/lighthouse.js @sourav2024
+/checks/html-report.js @sourav2024
+/SECURITY.md @sourav2024
+/.github/workflows/ @sourav2024

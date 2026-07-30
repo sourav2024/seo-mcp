@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/sourav2024/seo-mcp/discussions
+    about: Ask how something works, or float an idea before filing a request.
+  - name: Security vulnerability
+    url: https://github.com/sourav2024/seo-mcp/security/advisories/new
+    about: Report privately — please do not open a public issue.
+  - name: Documentation
+    url: https://github.com/sourav2024/seo-mcp#readme
+    about: Installation, configuration, troubleshooting, and FAQ.

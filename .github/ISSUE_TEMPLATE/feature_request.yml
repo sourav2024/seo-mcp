@@ -1,0 +1,87 @@
+name: Feature request
+description: Suggest a new check, tool, or improvement
+title: "[feature] "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. The most persuasive requests explain the SEO problem
+        being solved, not just the mechanism.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I searched existing issues and discussions for a duplicate
+          required: true
+        - label: I checked the [roadmap](https://github.com/sourav2024/seo-mcp#roadmap)
+          required: false
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of request is this?
+      options:
+        - "New check inside an existing tool"
+        - "New tool"
+        - "New output format or reporting option"
+        - "Configuration option"
+        - "Documentation improvement"
+        - "Developer experience"
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: |
+        What goes wrong today, or what can't you see? Concrete beats abstract.
+      placeholder: |
+        I can't tell whether hreflang tags are set up correctly on a multi-language
+        site, so I miss misconfigurations that cause the wrong locale to be indexed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: What would the tool check, and what should it report?
+      placeholder: |
+        A check_hreflang tool that:
+        - collects all <link rel="alternate" hreflang="..."> tags
+        - fails when return links are missing (a → b but not b → a)
+        - fails on invalid language codes
+        - warns when x-default is absent
+    validations:
+      required: true
+
+  - type: textarea
+    id: severity
+    attributes:
+      label: Suggested severities
+      description: |
+        For a new check: which findings should be ❌ fail (actively harms indexing),
+        ⚠️ warn (worth improving), or ✅ pass? Getting this right is most of the design.
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Google documentation, a spec, or an example page that demonstrates the issue.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to open a pull request for this
+          required: false

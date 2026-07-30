@@ -1,0 +1,70 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.sourav2024/technical-seo",
+  "description": "Audit websites for technical and on-page SEO: crawlability, HTTPS, Core Web Vitals, sitemap, robots.txt, structured data, keyword placement, and AI-crawler access. Reports as Markdown, JSON, or a shareable HTML file.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/sourav2024/seo-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://github.com/sourav2024/seo-mcp#readme",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "technical-seo-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "SEO_MCP_LOG_LEVEL",
+          "description": "Log verbosity: silent, error, warn, info (default), or debug. Logs go to stderr only.",
+          "isRequired": false,
+          "default": "info"
+        },
+        {
+          "name": "SEO_MCP_LOG_FORMAT",
+          "description": "Log shape: json (default, one object per line) or text (human-readable).",
+          "isRequired": false,
+          "default": "json"
+        },
+        {
+          "name": "SEO_MCP_STATE_DIR",
+          "description": "Where per-target baselines and fallback HTML reports are stored. Defaults to the OS state directory.",
+          "isRequired": false
+        },
+        {
+          "name": "SEO_MCP_FETCH_TIMEOUT_MS",
+          "description": "Per-request timeout in milliseconds (1000-120000). Raise for slow sites.",
+          "isRequired": false,
+          "default": "20000"
+        },
+        {
+          "name": "SEO_MCP_CRAWL_DELAY_MS",
+          "description": "Politeness delay between crawled pages in milliseconds (0-60000).",
+          "isRequired": false,
+          "default": "500"
+        },
+        {
+          "name": "SEO_MCP_CRAWL_CONCURRENCY",
+          "description": "Parallel page fetches during a crawl (1-8). Raise only for sites you own.",
+          "isRequired": false,
+          "default": "1"
+        },
+        {
+          "name": "SEO_MCP_ALLOW_PRIVATE_HOSTS",
+          "description": "Allow auditing localhost and private IP ranges. Defaults to true so local dev servers work; set to false to enable SSRF protection when URLs come from untrusted input.",
+          "isRequired": false,
+          "default": "true"
+        },
+        {
+          "name": "CHROME_PATH",
+          "description": "Path to a Chrome/Chromium/Edge binary. Auto-detected when unset; only run_lighthouse needs it.",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}

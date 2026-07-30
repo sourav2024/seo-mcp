@@ -1,0 +1,12 @@
+# Adds a "Sponsor" button to the top of the GitHub repository.
+#
+# This only renders once GitHub Sponsors is enabled on the account — enroll at
+# github.com/sponsors. Until then GitHub silently shows no button, so this is
+# safe to commit ahead of approval.
+github: [sourav2024]
+
+# Other platforms GitHub supports, if you add them later. Open Collective is
+# worth considering if this becomes multi-maintainer (transparent budget, and a
+# fiscal host handles compliance):
+# ko_fi, open_collective, patreon, liberapay, polar, thanks_dev, tidelift,
+# or custom: ["https://example.com/donate"]
