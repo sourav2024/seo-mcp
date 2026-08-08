@@ -11,8 +11,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-ff69b4.svg)](https://github.com/sponsors/sourav2024)
 
-13 tools covering crawlability, HTTPS, Core Web Vitals, sitemaps, `robots.txt`,
-structured data, keyword placement, and AI-crawler access. Reports come back as
+14 tools covering crawlability, HTTPS, Core Web Vitals, sitemaps, `robots.txt`,
+structured data, international SEO (hreflang), keyword placement, and AI-crawler access. Reports come back as
 Markdown, JSON for CI, or a standalone HTML file you can open and send to a client.
 
 No API keys. No accounts. Every check runs directly against the live site.
@@ -57,7 +57,7 @@ telemetry, no signup.
 
 ## Features
 
-- **13 focused tools** — one full audit, one site crawl, and eleven individual
+- **14 focused tools** — one full audit, one site crawl, and twelve individual
   checks you can run in isolation
 - **AI-crawler visibility** — per-bot `robots.txt` status for GPTBot, ClaudeBot,
   Google-Extended, PerplexityBot, and CCBot, plus `llms.txt` and `noindex`
@@ -86,7 +86,7 @@ stay collapsed. All CSS is inlined and nothing is fetched, so it works offline.
 | ----------------- | ---------- | ------------------------------------------------------------------- |
 | **Node.js**       | ≥ 20.10    | Uses built-in `fetch` and `node:test`. Check with `node --version`. |
 | **An MCP client** | any        | See [supported clients](#supported-mcp-clients).                    |
-| **Google Chrome** | any recent | **Only** for `run_lighthouse`. The other 12 tools need nothing.     |
+| **Google Chrome** | any recent | **Only** for `run_lighthouse`. The other 13 tools need nothing.     |
 
 Chrome is auto-detected on macOS, Linux, and Windows. Set `CHROME_PATH` if yours
 lives somewhere unusual. Lighthouse itself is fetched on demand via `npx` on
@@ -190,7 +190,7 @@ register — usually a typo in the config JSON or a config file that wasn't relo
 - **Claude Desktop** — the tools appear under the 🔨 icon in the message box.
   Restart the app after editing the config; it does not reload on its own.
 - **Any client** — ask _"What technical SEO tools do you have?"_ The assistant
-  should list `seo_full_audit`, `crawl_audit`, and the eleven `check_*` tools.
+  should list `seo_full_audit`, `crawl_audit`, and the twelve `check_*` tools.
 
 **3. Run your first audit.** This confirms the whole path works end to end:
 
@@ -241,18 +241,19 @@ bug report) is welcome.
 
 ### Technical SEO
 
-| Tool                    | Checks                                                                                                                                                                                                                                                                                      |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `check_rendering`       | Fetches the page **without JavaScript** and detects client-side JS shells that Google/AI crawlers struggle to read — recommends SSR/SSG when needed                                                                                                                                         |
-| `check_https`           | Valid SSL certificate on `https://`, and a permanent **301** redirect from `http://` (flags temporary 302/307)                                                                                                                                                                              |
-| `check_url_structure`   | Clean-URL rules: ≤ ~60 chars, lowercase, hyphens not underscores, no accents, no messy query params, shallow hierarchy. **Offline** — makes no requests                                                                                                                                     |
-| `check_page_essentials` | `<title>` presence and length, meta description, exactly one `<h1>`, canonical tag, Open Graph tags, responsive viewport meta, image lazy-loading, WebP/AVIF usage, and explicit image `width`/`height` (CLS risk — no Lighthouse run needed)                                               |
-| `check_caching`         | `Cache-Control`, compression (gzip/brotli), `ETag`/`Last-Modified` revalidation, HTML document size                                                                                                                                                                                         |
-| `check_sitemap`         | `/sitemap.xml` exists, entry count, admin/cart/checkout URLs that should be excluded, **samples up to 10 `<loc>` URLs** to verify they return 200 with no redirects, and flags missing or stale `lastmod`                                                                                   |
-| `check_robots`          | `/robots.txt` exists **and is valid** (catches HTML pages or redirects served at that path), references the sitemap, and doesn't accidentally block the whole site                                                                                                                          |
-| `check_structured_data` | Extracts schema.org **JSON-LD** (tolerates arrays and `@graph`): Organization (incl. `sameAs`), SoftwareApplication, FAQPage (Question/acceptedAnswer structure), BreadcrumbList. Malformed blocks are flagged with the parse error; no JSON-LD gets a ready-to-paste Organization example  |
-| `check_ai_crawlers`     | Effective allow/block status per bot — **GPTBot, ClaudeBot, Google-Extended, PerplexityBot, CCBot** — and the `*` default. Checks `/llms.txt`, and flags `noindex`/`nofollow` in **both** the `X-Robots-Tag` header and `<meta name="robots">`, which a plain `robots.txt` check cannot see |
-| `run_lighthouse`        | Lighthouse performance + SEO scores and **Core Web Vitals**: LCP (≤ 2.5 s), CLS (≤ 0.1), INP (≤ 200 ms — falls back to TBT when a lab run can't simulate interactions), plus top speed opportunities. Mobile by default. Slow (~1–2 min); requires Chrome                                   |
+| Tool                    | Checks                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `check_rendering`       | Fetches the page **without JavaScript** and detects client-side JS shells that Google/AI crawlers struggle to read — recommends SSR/SSG when needed                                                                                                                                                                                                                                                                                                                                                                       |
+| `check_https`           | Valid SSL certificate on `https://`, and a permanent **301** redirect from `http://` (flags temporary 302/307)                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `check_url_structure`   | Clean-URL rules: ≤ ~60 chars, lowercase, hyphens not underscores, no accents, no messy query params, shallow hierarchy. **Offline** — makes no requests                                                                                                                                                                                                                                                                                                                                                                   |
+| `check_page_essentials` | `<title>` presence and length, meta description, exactly one `<h1>`, canonical tag, Open Graph tags, responsive viewport meta, image lazy-loading, WebP/AVIF usage, and explicit image `width`/`height` (CLS risk — no Lighthouse run needed)                                                                                                                                                                                                                                                                             |
+| `check_caching`         | `Cache-Control`, compression (gzip/brotli), `ETag`/`Last-Modified` revalidation, HTML document size                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `check_sitemap`         | `/sitemap.xml` exists, entry count, admin/cart/checkout URLs that should be excluded, **samples up to 10 `<loc>` URLs** to verify they return 200 with no redirects, and flags missing or stale `lastmod`                                                                                                                                                                                                                                                                                                                 |
+| `check_robots`          | `/robots.txt` exists **and is valid** (catches HTML pages or redirects served at that path), references the sitemap, and doesn't accidentally block the whole site                                                                                                                                                                                                                                                                                                                                                        |
+| `check_hreflang`        | **International SEO.** Validates BCP-47 hreflang values (catching `en_US`, `en-UK`, `en-EU`), requires a self-referencing annotation, checks for `x-default`, flags duplicate/conflicting values and relative hrefs, and confirms `<html lang>` agrees. With `verify_return_links: true` it fetches each alternate and verifies reciprocity — **missing return links are the most common reason Google ignores an otherwise-correct cluster**. A single-language site is told hreflang isn't needed, not that it's broken |
+| `check_structured_data` | Extracts schema.org **JSON-LD** (tolerates arrays and `@graph`): Organization (incl. `sameAs`), SoftwareApplication, FAQPage (Question/acceptedAnswer structure), BreadcrumbList. Malformed blocks are flagged with the parse error; no JSON-LD gets a ready-to-paste Organization example                                                                                                                                                                                                                                |
+| `check_ai_crawlers`     | Effective allow/block status per bot — **GPTBot, ClaudeBot, Google-Extended, PerplexityBot, CCBot** — and the `*` default. Checks `/llms.txt`, and flags `noindex`/`nofollow` in **both** the `X-Robots-Tag` header and `<meta name="robots">`, which a plain `robots.txt` check cannot see                                                                                                                                                                                                                               |
+| `run_lighthouse`        | Lighthouse performance + SEO scores and **Core Web Vitals**: LCP (≤ 2.5 s), CLS (≤ 0.1), INP (≤ 200 ms — falls back to TBT when a lab run can't simulate interactions), plus top speed opportunities. Mobile by default. Slow (~1–2 min); requires Chrome                                                                                                                                                                                                                                                                 |
 
 ### On-page SEO
 
@@ -282,6 +283,8 @@ Ask in plain language; the client picks the tool.
 | "Is my LCP under 2.5 seconds on mobile?"                               | `run_lighthouse`                                  |
 | "Check keyword placement for 'freight broker software' on example.com" | `check_keyword_placement`                         |
 | "Validate my JSON-LD"                                                  | `check_structured_data`                           |
+| "I target the US and Canada — is my hreflang set up right?"            | `check_hreflang`                                  |
+| "Do my hreflang alternates all link back to each other?"               | `check_hreflang` with `verify_return_links: true` |
 | "Re-audit and tell me what changed since last time"                    | `seo_full_audit` with `compare_to_baseline: true` |
 | "Why isn't this page indexed?"                                         | `check_ai_crawlers` + `check_robots`              |
 
@@ -448,7 +451,6 @@ Not commitments — ideas, roughly in priority order.
 
 ### Next
 
-- `check_hreflang` — international/multi-language tag validation with return-link checks
 - `check_images` — deeper image audit (dimensions, formats, `srcset`, alt quality)
 - Core Web Vitals from real field data (CrUX API) alongside lab numbers
 - Internal-link graph analysis: orphan pages, click depth, anchor-text distribution

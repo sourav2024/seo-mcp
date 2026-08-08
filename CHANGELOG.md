@@ -9,6 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Nothing yet._
 
+## [1.1.0] — 2026-08-08
+
+### Added
+
+- **`check_hreflang` — international SEO.** Validates a page's hreflang cluster:
+  BCP-47 value shape (catching `en_US`, `en-UK`, `en-EU` and other common
+  mistakes), a required self-referencing annotation, `x-default` presence,
+  duplicate or conflicting values, relative `href`s, and agreement with
+  `<html lang>`. Comparing only the language subtag means `<html lang="en">`
+  alongside `hreflang="en-US"` is correctly treated as idiomatic, not a mismatch.
+
+  With `verify_return_links: true` it fetches each alternate (capped by
+  `max_alternates`, default 10) and confirms reciprocity — **a missing return
+  link is the most common reason Google ignores an otherwise-correct cluster**,
+  and it cannot be detected from a single page. Off by default because it costs
+  one request per alternate.
+
+  A single-language site is told hreflang simply isn't needed, rather than being
+  reported as broken.
+
+  The tool is included in `seo_full_audit` (without return-link verification, to
+  keep the full audit single-page), bringing the server to **14 tools**.
+
+### Fixed (pre-release)
+
+- **`check_hreflang` reported valid lowercase values as invalid.** hreflang is
+  case-insensitive per spec, and real sites ship `de-de` and `en-us` — GitLab's
+  entirely correct cluster is all-lowercase, and the shape test failed six of its
+  valid annotations. Values are now normalised to canonical casing before the
+  shape test, while the lowercase forms of genuine mistakes (`en-uk`, `en_us`)
+  are still caught.
+
 ## [1.0.0] — 2026-07-27
 
 First public release.
@@ -188,5 +220,6 @@ inputs keep working until the next major version — `check_keyword_placement`'s
 singular `keyword` parameter is an example of a shape kept for compatibility
 alongside the preferred `keywords` array.
 
-[Unreleased]: https://github.com/sourav2024/seo-mcp/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/sourav2024/seo-mcp/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/sourav2024/seo-mcp/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/sourav2024/seo-mcp/releases/tag/v1.0.0

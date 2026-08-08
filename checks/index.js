@@ -7,6 +7,7 @@ export { auditPageEssentials } from "./page-essentials.js";
 export { auditCaching } from "./caching.js";
 export { auditSitemap, collectSitemapUrls } from "./sitemap.js";
 export { auditRobots } from "./robots.js";
+export { auditHreflang, parseHreflangTags, hreflangValueProblem } from "./hreflang.js";
 export { auditKeywordPlacement } from "./keywords.js";
 export { auditStructuredData } from "./structured-data.js";
 export { auditAiCrawlers, parseRobotsGroups, botRobotsStatus, AI_BOTS } from "./ai-crawlers.js";
