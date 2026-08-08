@@ -107,8 +107,8 @@ try {
   /* ---- 2. Tool listing ---- */
   const list = await request("tools/list");
   const tools = list.result?.tools ?? [];
-  check("tools/list returns all 13 tools", () => {
-    assert.equal(tools.length, 13, `expected 13 tools, got ${tools.length}`);
+  check("tools/list returns all 14 tools", () => {
+    assert.equal(tools.length, 14, `expected 14 tools, got ${tools.length}`);
   });
   check("every tool has a name, description, and input schema", () => {
     for (const t of tools) {

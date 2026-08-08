@@ -20,6 +20,7 @@ import {
   auditCaching,
   auditSitemap,
   auditRobots,
+  auditHreflang,
   auditKeywordPlacement,
   auditStructuredData,
   auditAiCrawlers,
@@ -46,6 +47,7 @@ const TOOL_SUMMARY = [
   ["check_caching", "Cache-Control, compression, ETag, size"],
   ["check_sitemap", "sitemap.xml validity and sampled URLs"],
   ["check_robots", "robots.txt validity"],
+  ["check_hreflang", "International SEO: hreflang validity + return links"],
   ["check_keyword_placement", "On-page keyword placement and density"],
   ["check_structured_data", "JSON-LD / schema.org validation"],
   ["check_ai_crawlers", "GPTBot/ClaudeBot/etc. access + noindex"],
@@ -215,6 +217,10 @@ registerTool(
       ["Structured data", () => auditStructuredData(target, page)],
       ["Sitemap", () => auditSitemap(target, resources)],
       ["Robots", () => auditRobots(target, resources)],
+      // Return-link verification stays off here: the full audit is a single-page
+      // report and reciprocity costs one request per alternate. check_hreflang
+      // with verify_return_links: true is the deliberate deep pass.
+      ["Hreflang", () => auditHreflang(target, page)],
       ["AI crawlers", () => auditAiCrawlers(target, page, resources)],
     ];
     let completed = 1;
@@ -316,6 +322,39 @@ registerUrlCheck("check_robots", {
   urlDescription: "Any URL on the site — the origin's /robots.txt is checked",
   audit: (url) => auditRobots(url),
 });
+
+registerTool(
+  "check_hreflang",
+  {
+    title: "Check hreflang / international SEO",
+    description:
+      "Audit a page's hreflang annotations for multi-language or multi-country targeting (e.g. US + Canada): validates BCP-47 values (catching en_US, en-UK and other common mistakes), requires a self-referencing annotation, checks for x-default, flags duplicate/conflicting values and relative hrefs, and verifies <html lang> agrees. With verify_return_links: true it fetches each alternate and confirms it links back — missing return links are the most common reason Google ignores an otherwise-correct hreflang cluster. A single-language site correctly reports that hreflang is not needed.",
+    inputSchema: {
+      url: urlSchema("Page URL to audit, e.g. https://example.com/"),
+      verify_return_links: z
+        .boolean()
+        .default(false)
+        .describe(
+          "Fetch each alternate URL and confirm it points back to this page (reciprocity). Adds one request per alternate — off by default"
+        ),
+      max_alternates: z
+        .number()
+        .int()
+        .min(1)
+        .max(50)
+        .default(10)
+        .describe("Maximum alternates to fetch when verify_return_links is true (default 10)"),
+    },
+    annotations: { readOnlyHint: true, openWorldHint: true },
+  },
+  async ({ url, verify_return_links, max_alternates }) =>
+    ok(
+      await auditHreflang(assertFetchableUrl(url).href, undefined, {
+        verifyReturnLinks: verify_return_links,
+        maxAlternates: max_alternates,
+      })
+    )
+);
 
 registerUrlCheck("check_structured_data", {
   title: "Check structured data (JSON-LD)",

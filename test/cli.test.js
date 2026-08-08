@@ -44,8 +44,9 @@ test("--help documents usage, tools, and configuration", async () => {
   const { code, stdout } = await run(["--help"]);
   assert.equal(code, 0);
   assert.match(stdout, /USAGE/);
-  assert.match(stdout, /TOOLS \(13\)/, "the tool count should be derived and current");
+  assert.match(stdout, /TOOLS \(14\)/, "the tool count should be derived and current");
   assert.match(stdout, /seo_full_audit/);
+  assert.match(stdout, /check_hreflang/);
   assert.match(stdout, /run_lighthouse/);
   assert.match(stdout, /SEO_MCP_LOG_LEVEL/);
   // Users mistake this for an interactive CLI; the help must correct that.
