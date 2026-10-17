@@ -33,10 +33,10 @@ Also confirm:
 - [ ] `package.json` `version` matches the tag you're about to create
 - [ ] `server.json` `version` **and** its `packages[0].version` match too
       (the MCP Registry validates this)
-- [ ] The skill in `skill/technical-seo-audit/` pins the same version
+- [ ] The skill in `skill/seo-intelligence/` pins the same version
       (`technical-seo-mcp@x.y.z` and `metadata.version`) — `npm test` fails
       otherwise. After publishing, rebuild the Agensi upload with
-      `npm run skill:zip` (writes `dist/technical-seo-audit.zip`, SKILL.md at
+      `npm run skill:zip` (writes `dist/seo-intelligence.zip`, SKILL.md at
       the zip root).
 
 ## Publish

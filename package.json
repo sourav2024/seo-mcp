@@ -44,7 +44,7 @@
     "prepublishOnly": "npm run check:placeholders && npm test",
     "lint:md": "markdownlint-cli2",
     "check:placeholders": "node scripts/check-placeholders.js",
-    "skill:zip": "rm -f dist/technical-seo-audit.zip && mkdir -p dist && cd skill/technical-seo-audit && zip -qrX ../../dist/technical-seo-audit.zip . -x '.*' && cd ../.. && unzip -l dist/technical-seo-audit.zip"
+    "skill:zip": "rm -f dist/seo-intelligence.zip && mkdir -p dist && cd skill/seo-intelligence && zip -qrX ../../dist/seo-intelligence.zip . -x '.*' && cd ../.. && unzip -l dist/seo-intelligence.zip"
   },
   "keywords": [
     "mcp",

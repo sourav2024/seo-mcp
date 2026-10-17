@@ -1,5 +1,5 @@
 /**
- * Keeps the agent skill in skill/technical-seo-audit/ honest against the server
+ * Keeps the agent skill in skill/seo-intelligence/ honest against the server
  * it drives: pinned versions match this release, every tool it names exists,
  * and the SKILL.md frontmatter satisfies the Agent Skills format. Offline.
  */
@@ -11,7 +11,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const skillDir = path.join(root, "skill", "technical-seo-audit");
+const skillDir = path.join(root, "skill", "seo-intelligence");
 const pkg = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
 const skillMd = readFileSync(path.join(skillDir, "SKILL.md"), "utf8");
 
@@ -28,7 +28,7 @@ test("SKILL.md frontmatter is valid", () => {
   assert.ok(fm, "SKILL.md must start with YAML frontmatter");
   const name = fm.match(/^name: (.+)$/m)?.[1];
   const description = fm.match(/^description: "(.+)"$/m)?.[1];
-  assert.equal(name, "technical-seo-audit", "name must match the skill's folder name");
+  assert.equal(name, path.basename(skillDir), "name must match the skill's folder name");
   assert.match(name, /^[a-z0-9]+(-[a-z0-9]+)*$/);
   assert.ok(description && description.length <= 1024, "description is required, quoted, and at most 1024 chars");
   // Unquoted YAML values may not contain ": " — it silently breaks parsing.
