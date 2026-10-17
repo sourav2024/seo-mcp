@@ -2,7 +2,7 @@
   "mcpServers": {
     "technical-seo": {
       "command": "npx",
-      "args": ["-y", "technical-seo-mcp@1.2.0"]
+      "args": ["-y", "technical-seo-mcp@1.2.1"]
     }
   }
 }

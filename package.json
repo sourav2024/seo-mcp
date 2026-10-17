@@ -1,6 +1,6 @@
 {
   "name": "technical-seo-mcp",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "MCP server for technical & on-page SEO audits — crawlability, HTTPS, Core Web Vitals, sitemap, robots.txt, structured data, and AI-crawler access. Reports as Markdown, JSON, or a shareable HTML file.",
   "type": "module",
   "bin": {

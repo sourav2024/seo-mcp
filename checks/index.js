@@ -5,7 +5,7 @@ export { auditHttps, httpRedirectLine } from "./https.js";
 export { auditUrlStructure } from "./urls.js";
 export { auditPageEssentials } from "./page-essentials.js";
 export { auditCaching } from "./caching.js";
-export { auditSitemap, collectSitemapUrls } from "./sitemap.js";
+export { auditSitemap, collectSitemapUrls, discoverSitemap, parseRobotsSitemaps } from "./sitemap.js";
 export { auditRobots } from "./robots.js";
 export { auditHreflang, parseHreflangTags, hreflangValueProblem } from "./hreflang.js";
 export { auditKeywordPlacement } from "./keywords.js";

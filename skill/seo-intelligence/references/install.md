@@ -3,7 +3,7 @@
 The skill drives an MCP server published on npm as
 [`technical-seo-mcp`](https://www.npmjs.com/package/technical-seo-mcp)
 (MIT, source: <https://github.com/sourav2024/seo-mcp>). Every agent launches it
-the same way — `npx -y technical-seo-mcp@1.2.0` over stdio — only the config
+the same way — `npx -y technical-seo-mcp@1.2.1` over stdio — only the config
 file differs.
 
 **Requirements:** Node.js 20.10 or newer (`node --version`). Google Chrome only
@@ -15,7 +15,7 @@ server, **restart the agent** so it picks up the new tools.
 ## Claude Code
 
 ```bash
-claude mcp add technical-seo -s user -- npx -y technical-seo-mcp@1.2.0
+claude mcp add technical-seo -s user -- npx -y technical-seo-mcp@1.2.1
 ```
 
 `-s user` makes it available in every project. Check with `claude mcp list`.
@@ -54,13 +54,13 @@ Append [`templates/codex-config.toml`](../templates/codex-config.toml) to
 Any client that takes an `mcpServers` object accepts
 [`templates/mcp.json`](../templates/mcp.json) as-is (Gemini CLI:
 `~/.gemini/settings.json`). For anything else: command `npx`, arguments
-`-y technical-seo-mcp@1.2.0`, transport stdio.
+`-y technical-seo-mcp@1.2.1`, transport stdio.
 
 ## Windows
 
 If the client reports that `npx` can't be found or spawned, use
 `"command": "cmd"` and put `"/c", "npx"` in front of the other arguments:
-`"args": ["/c", "npx", "-y", "technical-seo-mcp@1.2.0"]`.
+`"args": ["/c", "npx", "-y", "technical-seo-mcp@1.2.1"]`.
 
 ## Optional settings
 
@@ -78,8 +78,8 @@ Add an `env` object next to `command`/`args` to change these:
 ## Troubleshooting
 
 - **Tools don't appear:** restart the agent; run
-  `npx -y technical-seo-mcp@1.2.0 --version` in a terminal — it should print
-  `1.2.0`. If `node` is missing, install Node.js 20.10+.
+  `npx -y technical-seo-mcp@1.2.1 --version` in a terminal — it should print
+  `1.2.1`. If `node` is missing, install Node.js 20.10+.
 - **"spawn npx ENOENT" from a desktop app:** GUI apps can inherit a minimal
   `PATH`. Use the absolute path from `which npx` (macOS/Linux) as `command`.
 - **`run_lighthouse` fails:** install Google Chrome or set `CHROME_PATH`. The
