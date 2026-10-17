@@ -322,8 +322,8 @@ registerUrlCheck("check_caching", {
 registerUrlCheck("check_sitemap", {
   title: "Check sitemap.xml",
   description:
-    "Fetch /sitemap.xml, count entries, flag admin/cart/checkout/internal-search URLs, sample up to 10 <loc> URLs to verify they return 200 without redirects, and check lastmod presence/freshness.",
-  urlDescription: "Any URL on the site — the origin's /sitemap.xml is checked",
+    "Find the site's sitemap the way search engines do (robots.txt Sitemap: lines, then /sitemap.xml, then sitemap-index.xml / sitemap_index.xml / wp-sitemap.xml), count entries, flag admin/cart/checkout/internal-search URLs, sample up to 10 <loc> URLs (from the first child sitemap for an index) to verify they return 200 without redirects, and check lastmod presence/freshness.",
+  urlDescription: "Any URL on the site — its sitemap is discovered from the origin's robots.txt",
   audit: (url) => auditSitemap(url),
 });
 

@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Nothing yet._
 
+## [1.2.1] — 2026-10-17
+
+### Fixed
+
+- **`check_sitemap` reported "missing" on sites whose sitemap isn't at
+  `/sitemap.xml`.** Astro and Gatsby publish `sitemap-index.xml` and declare it
+  in robots.txt, so a correctly configured site got a false failure. The
+  sitemap is now discovered the way search engines do it: the `Sitemap:` lines
+  in robots.txt first, then `/sitemap.xml`, then `sitemap-index.xml`,
+  `sitemap_index.xml`, and `wp-sitemap.xml`. A sitemap found only at a
+  well-known path is a warning ("declare it in robots.txt"), not a failure. An
+  SPA that answers `/sitemap.xml` with its HTML shell is no longer mistaken for
+  a sitemap, and a declared sitemap that 404s now says which robots.txt line is
+  wrong.
+- **Sitemap indexes had no URLs sampled.** For an index, the first child
+  sitemap is now fetched and its URLs and `lastmod` values checked — on Yoast,
+  Astro, and Gatsby sites this previously skipped the most useful part of the
+  check. A child sitemap that fails to load is reported.
+- `crawl_audit` seeds from the same discovery, including every sitemap declared
+  in robots.txt, and fetches each sitemap once.
+
 ## [1.2.0] — 2026-10-17
 
 ### Security
@@ -259,7 +280,8 @@ inputs keep working until the next major version — `check_keyword_placement`'s
 singular `keyword` parameter is an example of a shape kept for compatibility
 alongside the preferred `keywords` array.
 
-[Unreleased]: https://github.com/sourav2024/seo-mcp/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/sourav2024/seo-mcp/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/sourav2024/seo-mcp/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/sourav2024/seo-mcp/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/sourav2024/seo-mcp/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/sourav2024/seo-mcp/releases/tag/v1.0.0

@@ -4,8 +4,8 @@ description: "Diagnose and fix technical and on-page SEO with the technical-seo 
 license: MIT
 compatibility: Needs an agent that supports MCP over stdio, Node.js 20.10+, and network access to the sites being audited. Google Chrome only for Lighthouse.
 metadata:
-  version: "1.2.0"
-  mcp-package: technical-seo-mcp@1.2.0
+  version: "1.2.1"
+  mcp-package: technical-seo-mcp@1.2.1
   source: https://github.com/sourav2024/seo-mcp
 ---
 
@@ -33,7 +33,7 @@ be prefixed with the server name, e.g. `mcp__technical-seo__seo_full_audit`).
 - **The site being audited** — ordinary GET/HEAD requests, identified by the
   user agent `seo-mcp/<version>`. A crawl waits 500 ms between pages by default.
 - **registry.npmjs.org** — once, when the agent first launches
-  `npx technical-seo-mcp@1.2.0`, and once for `lighthouse@13.5.0` the first
+  `npx technical-seo-mcp@1.2.1`, and once for `lighthouse@13.5.0` the first
   time `run_lighthouse` is used.
 - **Local disk** — only when asked: `output: "html"` writes a report file, and
   `compare_to_baseline: true` saves a baseline in the OS state directory.
@@ -95,11 +95,12 @@ Judgement calls the raw output can't make for you:
 - **FAQ structured data:** valid schema, but Google shows FAQ rich results only
   for well-known government and health sites. Keep it for AI answers; don't
   promise rich results.
-- **"sitemap.xml missing":** the checks look only at `/sitemap.xml`. Before
-  calling it a failure, read the `Sitemap:` line in robots.txt — Astro, Gatsby,
-  and some WordPress setups publish `sitemap-index.xml` or `sitemap_index.xml`
-  instead. Search engines find those through robots.txt, so the real fix is a
-  `/sitemap.xml` redirect for tools that guess the path, not a new sitemap.
+- **Sitemap found but "not declared in robots.txt":** a warning, not a
+  failure — Google can still be given the sitemap in Search Console. The fix
+  is one `Sitemap:` line in robots.txt, so every other crawler finds it too.
+- **Sitemap URLs that redirect:** usually a trailing-slash or casing mismatch
+  between the sitemap generator and the router. Fix the generator's URL format
+  (or the framework's trailing-slash setting) once, rather than editing entries.
 - **Keyword density:** a signal for "is the page about this?", not a target to
   hit. Never recommend repeating a keyword to raise the number.
 

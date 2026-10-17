@@ -50,14 +50,14 @@ sitemap at build time (e.g. the `next-sitemap` package) or from
 
 ## Astro
 
-| Finding           | Fix                                                                                                                                         |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Title / meta / OG | In the shared layout's `<head>` (usually `src/layouts/*.astro`), fed by props from each page                                                |
-| Canonical         | `<link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />` — requires `site` in `astro.config.*`                             |
-| sitemap.xml       | `@astrojs/sitemap` integration (needs `site`). It writes `sitemap-index.xml`; reference it from robots.txt or add a `/sitemap.xml` redirect |
-| robots.txt        | `public/robots.txt`, or `src/pages/robots.txt.ts` to build it from `site`                                                                   |
-| Images            | `<Image>` from `astro:assets` sets width/height and outputs WebP; use `loading="eager"` on the hero image                                   |
-| Empty JS shell    | Rare in Astro; check for a page that renders only a `client:only` island                                                                    |
+| Finding           | Fix                                                                                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Title / meta / OG | In the shared layout's `<head>` (usually `src/layouts/*.astro`), fed by props from each page                                  |
+| Canonical         | `<link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />` — requires `site` in `astro.config.*`               |
+| sitemap.xml       | `@astrojs/sitemap` integration (needs `site`). It writes `sitemap-index.xml`; declare it in robots.txt with a `Sitemap:` line |
+| robots.txt        | `public/robots.txt`, or `src/pages/robots.txt.ts` to build it from `site`                                                     |
+| Images            | `<Image>` from `astro:assets` sets width/height and outputs WebP; use `loading="eager"` on the hero image                     |
+| Empty JS shell    | Rare in Astro; check for a page that renders only a `client:only` island                                                      |
 
 ## SvelteKit
 
