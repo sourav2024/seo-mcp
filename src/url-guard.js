@@ -12,6 +12,7 @@
  * staging site is a primary local use case. Set SEO_MCP_ALLOW_PRIVATE_HOSTS=false
  * when exposing this server to untrusted input.
  */
+import { promises as dns } from "node:dns";
 import { config } from "./config.js";
 
 const MAX_URL_LENGTH = 2048;
@@ -93,6 +94,13 @@ function isPrivateIpv6(host) {
   // IPv4-mapped (::ffff:127.0.0.1) — unwrap and check as IPv4.
   const mapped = h.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
   if (mapped) return isPrivateIpv4(mapped[1]);
+  // The same mapping in hex form (::ffff:7f00:1), which is how the WHATWG URL
+  // parser serializes it — "[::ffff:127.0.0.1]" arrives here as "::ffff:7f00:1".
+  const hex = h.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+  if (hex) {
+    const n = parseInt(hex[1], 16) * 65536 + parseInt(hex[2], 16);
+    return isPrivateIpv4([n >>> 24, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join("."));
+  }
   return false;
 }
 
@@ -168,6 +176,48 @@ export function assertFetchableUrl(url, { context = "URL" } = {}) {
     );
 
   return parsed;
+}
+
+/** Whether a string is an IP literal (IPv4 dotted quad or IPv6, bracketed or not). */
+function isIpLiteral(host) {
+  return /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(":");
+}
+
+/**
+ * Resolve a hostname and reject it when any address it resolves to is private.
+ *
+ * The synchronous checks above only see the hostname, so a public name whose DNS
+ * points at 127.0.0.1 or 169.254.169.254 would pass them. This closes that gap
+ * by checking every resolved address before the request is made. It is a no-op
+ * while private hosts are allowed (the default), so local use pays no DNS cost.
+ *
+ * Residual risk: the check and fetch()'s own connect resolve separately, so a
+ * DNS server answering with a TTL of 0 can still swap the address in between
+ * (DNS rebinding). See SECURITY.md.
+ *
+ * @param {string} url
+ * @param {{ allowPrivate?: boolean, lookup?: Function, context?: string }} [opts]
+ *   lookup is injectable for tests; it must behave like dns.promises.lookup.
+ */
+export async function assertResolvesPublic(
+  url,
+  { allowPrivate = config.allowPrivateHosts, lookup = dns.lookup, context = "URL" } = {}
+) {
+  if (allowPrivate) return;
+  const host = new URL(url).hostname.replace(/^\[|\]$/g, "");
+  if (isIpLiteral(host)) return; // literals were already checked by assertFetchableUrl
+  let addresses;
+  try {
+    addresses = await lookup(host, { all: true, verbatim: true });
+  } catch {
+    return; // unresolvable: fetch() will fail with its own, clearer DNS error
+  }
+  const bad = addresses.find(({ address }) => isPrivateHost(address));
+  if (bad)
+    throw new UrlValidationError(
+      `${context} host "${host}" resolves to a private address (${bad.address}), which is blocked because ` +
+        `SEO_MCP_ALLOW_PRIVATE_HOSTS=false.`
+    );
 }
 
 /**

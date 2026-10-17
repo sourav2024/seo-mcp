@@ -127,9 +127,14 @@ try {
     assert.deepEqual(full.inputSchema.properties.output.enum, ["markdown", "json", "html"]);
     assert.ok(full.inputSchema.properties.output_path, "output_path should be available");
   });
-  check("tools declare read-only annotations", () => {
+  check("tools declare accurate annotations", () => {
+    // The report tools can write an HTML file and a baseline, so they must not
+    // claim to be read-only — but they never destroy anything.
     const full = tools.find((t) => t.name === "seo_full_audit");
-    assert.equal(full.annotations?.readOnlyHint, true, "audits are read-only and should say so");
+    assert.equal(full.annotations?.readOnlyHint, false, "seo_full_audit writes files and must say so");
+    assert.equal(full.annotations?.destructiveHint, false, "seo_full_audit never overwrites user files");
+    const robots = tools.find((t) => t.name === "check_robots");
+    assert.equal(robots.annotations?.readOnlyHint, true, "single checks only read");
   });
 
   /* ---- 3. Offline tool call (no network needed) ---- */

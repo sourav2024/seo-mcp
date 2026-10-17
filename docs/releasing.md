@@ -23,7 +23,7 @@ Do these once, before the first publish.
 ## Pre-flight
 
 ```bash
-npm run verify        # lint (Prettier + markdownlint) + 106 tests + MCP smoke test
+npm run verify        # lint (Prettier + markdownlint) + unit tests + MCP smoke test
 npm pack --dry-run    # confirm the file list: no tests, docs, images, or CI config
 ```
 
@@ -33,6 +33,11 @@ Also confirm:
 - [ ] `package.json` `version` matches the tag you're about to create
 - [ ] `server.json` `version` **and** its `packages[0].version` match too
       (the MCP Registry validates this)
+- [ ] The skill in `skill/technical-seo-audit/` pins the same version
+      (`technical-seo-mcp@x.y.z` and `metadata.version`) — `npm test` fails
+      otherwise. After publishing, rebuild the Agensi upload with
+      `npm run skill:zip` (writes `dist/technical-seo-audit.zip`, SKILL.md at
+      the zip root).
 
 ## Publish
 

@@ -53,17 +53,17 @@ user's own machine, and it makes outbound HTTP requests to URLs the user supplie
 
 ### What is defended
 
-| Risk                    | Mitigation                                                                                                                                                                                                                                                            |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Command injection**   | Lighthouse is spawned with `execFile` and `shell: false` on every platform. On Windows, `npx.cmd` runs via `cmd.exe /c` with a separate argument array, so URL metacharacters cannot break out. URLs are validated before being passed as arguments.                  |
-| **SSRF**                | Only `http:`/`https:` are fetchable. Redirects are followed manually and re-validated on every hop. Setting `SEO_MCP_ALLOW_PRIVATE_HOSTS=false` blocks RFC1918, loopback, link-local (including `169.254.169.254`), CGNAT, multicast, and IPv4-mapped IPv6 addresses. |
-| **XSS in reports**      | All page-derived text and the target URL are HTML-escaped in HTML reports. Reports contain no `<script>`, no `src=`, and no CSS `url()`, so an audited page cannot execute code in a report opened locally.                                                           |
-| **Path traversal**      | Baseline filenames are built from a `[a-z0-9-]`-whitelisted slug plus a SHA-256 hash, so no `/`, `\`, or `..` from a URL can reach the filesystem path.                                                                                                               |
-| **Prototype pollution** | Maps keyed by page-derived strings use `Object.create(null)`. Parsed baseline JSON is copied onto a null-prototype object before use.                                                                                                                                 |
-| **Memory exhaustion**   | Response bodies are capped (`SEO_MCP_MAX_BODY_BYTES`, default 10 MB). JSON-LD traversal is depth-, count-, and cycle-limited. Log fields are truncated and cycle-aware.                                                                                               |
-| **Resource exhaustion** | Every request has a timeout. Redirect chains are hop-limited and loop-detecting. Crawls are page-capped and rate-limited.                                                                                                                                             |
-| **Credential leakage**  | Logs redact sensitive field names and strip userinfo and credential-bearing query parameters from URLs. The server has no API keys or secrets of its own.                                                                                                             |
-| **Stream/socket leaks** | Response readers are released in a `finally` block, so an early exit cannot pin a socket for the life of a crawl.                                                                                                                                                     |
+| Risk                    | Mitigation                                                                                                                                                                                                                                                                                                                                                       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Command injection**   | Lighthouse is spawned with `execFile` and `shell: false` on every platform. On Windows, `npx.cmd` runs via `cmd.exe /c` with a separate argument array, so URL metacharacters cannot break out. URLs are validated before being passed as arguments.                                                                                                             |
+| **SSRF**                | Only `http:`/`https:` are fetchable. Redirects are followed manually and re-validated on every hop. Setting `SEO_MCP_ALLOW_PRIVATE_HOSTS=false` blocks RFC1918, loopback, link-local (including `169.254.169.254`), CGNAT, multicast, and IPv4-mapped IPv6 addresses (dotted and hex forms), checked against both the hostname and every address it resolves to. |
+| **XSS in reports**      | All page-derived text and the target URL are HTML-escaped in HTML reports. Reports contain no `<script>`, no `src=`, and no CSS `url()`, so an audited page cannot execute code in a report opened locally.                                                                                                                                                      |
+| **Path traversal**      | Baseline filenames are built from a `[a-z0-9-]`-whitelisted slug plus a SHA-256 hash, so no `/`, `\`, or `..` from a URL can reach the filesystem path.                                                                                                                                                                                                          |
+| **Prototype pollution** | Maps keyed by page-derived strings use `Object.create(null)`. Parsed baseline JSON is copied onto a null-prototype object before use.                                                                                                                                                                                                                            |
+| **Memory exhaustion**   | Response bodies are capped (`SEO_MCP_MAX_BODY_BYTES`, default 10 MB). JSON-LD traversal is depth-, count-, and cycle-limited. Log fields are truncated and cycle-aware.                                                                                                                                                                                          |
+| **Resource exhaustion** | Every request has a timeout. Redirect chains are hop-limited and loop-detecting. Crawls are page-capped and rate-limited.                                                                                                                                                                                                                                        |
+| **Credential leakage**  | Logs redact sensitive field names and strip userinfo and credential-bearing query parameters from URLs. The server has no API keys or secrets of its own.                                                                                                                                                                                                        |
+| **Stream/socket leaks** | Response readers are released in a `finally` block, so an early exit cannot pin a socket for the life of a crawl.                                                                                                                                                                                                                                                |
 
 ### Known limitations
 
@@ -75,23 +75,30 @@ These are accepted trade-offs, not oversights.
    URLs come from the user — this is the correct default. **If you expose this
    server to input you do not control, set it to `false`.**
 
-2. **No DNS-rebinding protection.** Host checks run against the hostname and any
-   literal IP, not against the resolved address at connect time. A hostname that
-   resolves to a private address will still be fetched even with
-   `SEO_MCP_ALLOW_PRIVATE_HOSTS=false`. Closing this properly requires resolving
-   and pinning the address before connecting; it is tracked for a future release.
+2. **Partial DNS-rebinding protection.** With `SEO_MCP_ALLOW_PRIVATE_HOSTS=false`,
+   every hostname is resolved and rejected if any address is private, before
+   each request and each redirect hop. The check and `fetch()`'s own connect
+   resolve separately, though, so a DNS server answering with a TTL of 0 can
+   still swap in a private address between the two. Closing that window
+   requires pinning the resolved address for the connection; it is tracked for
+   a future release. `run_lighthouse` only pre-checks the starting host —
+   Chrome resolves and follows redirects on its own.
 
 3. **HTTP transport is not supported.** The server is stdio-only. Do not put it
    behind an HTTP endpoint without adding host allowlisting and authentication —
    arbitrary-URL fetching becomes a serious SSRF vector in a shared deployment.
 
-4. **`run_lighthouse` downloads code at runtime.** It invokes `npx lighthouse`,
-   which fetches the Lighthouse package from the npm registry on first use. If
+4. **`run_lighthouse` downloads code at runtime.** It invokes
+   `npx lighthouse@<pinned version>` (default `13.5.0`, override with an exact
+   version in `SEO_MCP_LIGHTHOUSE_VERSION`), which fetches that release from
+   the npm registry on first use. Pinning means a newly published Lighthouse
+   never runs without a deliberate version bump. If
    your threat model excludes runtime package downloads, avoid that one tool;
-   the other twelve make no such call.
+   the other thirteen make no such call.
 
 5. **HTML reports are written to disk.** `output: "html"` writes to the current
-   working directory by default. Reports contain audited-site content (escaped,
+   working directory by default. An existing file at the destination is only
+   replaced when it is itself an seo-mcp report. Reports contain audited-site content (escaped,
    but present), so treat them as you would any downloaded page.
 
 ### Dependency advisories

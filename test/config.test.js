@@ -75,6 +75,19 @@ test("booleans accept common spellings", () => {
   assert.equal(configWith({ SEO_MCP_ALLOW_PRIVATE_HOSTS: "maybe" }).allowPrivateHosts, true);
 });
 
+test("the Lighthouse version is pinned and only exact versions are accepted", () => {
+  assert.match(config.lighthouseVersion, /^\d+\.\d+\.\d+$/, "default must be an exact version");
+  assert.equal(configWith({ SEO_MCP_LIGHTHOUSE_VERSION: "12.8.2" }).lighthouseVersion, "12.8.2");
+  assert.equal(configWith({ SEO_MCP_LIGHTHOUSE_VERSION: "13.0.0-beta.1" }).lighthouseVersion, "13.0.0-beta.1");
+  // Ranges, tags and other npm specs would defeat the pin — fall back to the default.
+  for (const bad of ["latest", "^13.0.0", "13", "github:evil/lighthouse", "13.5.0 --foo"])
+    assert.equal(
+      configWith({ SEO_MCP_LIGHTHOUSE_VERSION: bad }).lighthouseVersion,
+      config.lighthouseVersion,
+      `${bad} should be rejected`
+    );
+});
+
 test("empty-string env vars are treated as unset", () => {
   assert.equal(configWith({ SEO_MCP_FETCH_TIMEOUT_MS: "" }).fetchTimeoutMs, 20_000);
 });

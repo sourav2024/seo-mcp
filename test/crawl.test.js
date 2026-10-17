@@ -28,6 +28,8 @@ async function crawlInChildProcess(targetOrigin, maxPages, env) {
   const { stdout } = await execFileAsync(
     process.execPath,
     [
+      // Top-level await in -e needs module mode explicitly on Node 20.
+      "--input-type=module",
       "-e",
       `const { crawlAudit } = await import("./checks/index.js");
        process.stdout.write(await crawlAudit(process.env.TEST_ORIGIN, ${maxPages}));`,

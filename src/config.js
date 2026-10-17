@@ -37,6 +37,21 @@ function envEnum(name, fallback, allowed) {
   return v;
 }
 
+/**
+ * An exact npm version (x.y.z, optional prerelease). Ranges, tags like "latest",
+ * and git/URL specs are refused: the value is spliced into an `npx` package spec,
+ * and the point of pinning is that the code that runs is the code that was tested.
+ */
+function envVersion(name, fallback) {
+  const raw = process.env[name];
+  if (raw == null || raw === "") return fallback;
+  if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(raw)) {
+    warnings.push(`${name}="${raw}" is not an exact version like 13.5.0 — using default ${fallback}.`);
+    return fallback;
+  }
+  return raw;
+}
+
 function envBool(name, fallback) {
   const raw = process.env[name];
   if (raw == null || raw === "") return fallback;
@@ -82,6 +97,12 @@ export const config = Object.freeze({
 
   /* ---- Lighthouse ---- */
   lighthouseTimeoutMs: envInt("SEO_MCP_LIGHTHOUSE_TIMEOUT_MS", 180_000, { min: 30_000, max: 600_000 }),
+  /**
+   * Lighthouse version run via npx. Pinned so every run executes the same
+   * reviewed release instead of whatever "latest" is that day — both a
+   * supply-chain guard and protection against report-format changes.
+   */
+  lighthouseVersion: envVersion("SEO_MCP_LIGHTHOUSE_VERSION", "13.5.0"),
   /** Explicit Chrome binary; auto-detected when unset. */
   chromePath: process.env.CHROME_PATH || null,
 
@@ -115,6 +136,7 @@ export function initConfig(log) {
     stateDir: config.stateDir,
     allowPrivateHosts: config.allowPrivateHosts,
     chromePath: config.chromePath ?? "(auto-detect)",
+    lighthouseVersion: config.lighthouseVersion,
   });
   return config;
 }

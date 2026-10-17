@@ -40,7 +40,7 @@ Install Google Chrome, or point at an existing binary:
 Reproduce outside the server to isolate the problem:
 
 ```bash
-npx lighthouse https://example.com --only-categories=performance,seo
+npx lighthouse@13.5.0 https://example.com --only-categories=performance,seo
 ```
 
 The other 12 tools work fine without Chrome.
@@ -92,7 +92,10 @@ about and writes reports locally.
 Yes — that's a primary use case. `http://localhost:3000` works out of the box.
 
 **Will it modify my site?**
-No. Every tool is read-only (GET requests) and annotated `readOnlyHint`.
+No. Every request to the audited site is a read (GET or HEAD). The only things
+written are local: `output: "html"` writes a report file, and
+`compare_to_baseline` saves a baseline. An existing file is only replaced if it
+is an earlier seo-mcp report — anything else at `output_path` is left untouched.
 
 **How is this different from Lighthouse or Search Console?**
 Lighthouse measures performance on one page; Search Console reports what Google

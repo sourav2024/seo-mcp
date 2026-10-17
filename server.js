@@ -152,6 +152,18 @@ const OUTPUT_PARAMS = {
  * supports a schema conditional on input.
  */
 
+/**
+ * The two report tools are not read-only: output: "html" writes a file and
+ * compare_to_baseline writes a baseline. They never destroy anything — an
+ * existing file is only overwritten when it is an earlier seo-mcp report.
+ */
+const REPORT_ANNOTATIONS = Object.freeze({
+  readOnlyHint: false,
+  destructiveHint: false,
+  idempotentHint: false,
+  openWorldHint: true,
+});
+
 /* ------------------------------------------------------------------ *
  * Registration helpers
  * ------------------------------------------------------------------ */
@@ -193,7 +205,7 @@ registerTool(
       url: urlSchema("Page URL to audit, e.g. https://example.com"),
       ...OUTPUT_PARAMS,
     },
-    annotations: { readOnlyHint: true, openWorldHint: true },
+    annotations: REPORT_ANNOTATIONS,
   },
   async ({ url, output, output_path, compare_to_baseline }, extra) => {
     const target = assertFetchableUrl(url).href;
@@ -261,7 +273,7 @@ registerTool(
         .describe(`Maximum pages to audit (default 25, max ${config.crawlMaxPagesLimit})`),
       ...OUTPUT_PARAMS,
     },
-    annotations: { readOnlyHint: true, openWorldHint: true },
+    annotations: REPORT_ANNOTATIONS,
   },
   async ({ url, max_pages, output, output_path, compare_to_baseline }, extra) => {
     const target = assertFetchableUrl(url).href;
@@ -463,7 +475,7 @@ registerTool(
       return ok(
         fail(
           `Lighthouse failed: ${describeError(err, { url: target })}\n` +
-            `Verify Chrome is installed and try manually: npx lighthouse ${target} --only-categories=performance,seo`
+            `Verify Chrome is installed and try manually: npx lighthouse@${config.lighthouseVersion} ${target} --only-categories=performance,seo`
         )
       );
     }
