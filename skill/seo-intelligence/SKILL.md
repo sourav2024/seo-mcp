@@ -1,5 +1,5 @@
 ---
-name: technical-seo-audit
+name: seo-intelligence
 description: "Diagnose and fix technical and on-page SEO with the technical-seo MCP server — audits, site crawls, Core Web Vitals, sitemaps, robots.txt, structured data, hreflang, keyword placement, and AI-crawler access (GPTBot, ClaudeBot). Use when the user asks why a page isn't ranking or indexed, wants an SEO audit, pre-launch or post-migration check, a client-ready SEO report, Core Web Vitals or Lighthouse numbers, help with sitemap/robots/canonical/schema/hreflang, or wants their site visible to AI search. Goes beyond reporting: maps each finding to the file that causes it and fixes it in the codebase, then re-audits to prove the fix."
 license: MIT
 compatibility: Needs an agent that supports MCP over stdio, Node.js 20.10+, and network access to the sites being audited. Google Chrome only for Lighthouse.
@@ -9,7 +9,7 @@ metadata:
   source: https://github.com/sourav2024/seo-mcp
 ---
 
-# Technical SEO audit
+# SEO Intelligence
 
 Turn "why isn't this ranking?" into a specific, fixed answer. The
 `technical-seo` MCP server does the measuring; this skill decides what to run,
