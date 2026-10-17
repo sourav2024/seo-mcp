@@ -14,5 +14,6 @@ seo-crawl-*.html
 
 # Packaging / tooling artifacts
 *.tgz
+dist/
 coverage/
 .DS_Store

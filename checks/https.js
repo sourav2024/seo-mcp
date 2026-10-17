@@ -1,5 +1,6 @@
 import { UA, parseUrlOrThrow, pass, warn, fail } from "./helpers.js";
 import { config } from "../src/config.js";
+import { assertResolvesPublic } from "../src/url-guard.js";
 
 /* ---------------- HTTPS / SSL ---------------- */
 
@@ -8,6 +9,7 @@ import { config } from "../src/config.js";
  * redirect logic is testable against a local fixture server (no TLS needed).
  */
 export async function httpRedirectLine(httpUrl) {
+  await assertResolvesPublic(httpUrl);
   const res = await fetch(httpUrl, {
     headers: { "User-Agent": UA },
     redirect: "manual",
@@ -42,6 +44,7 @@ export async function auditHttps(url, page) {
   } else {
     try {
       // HEAD: we only need the handshake to succeed, not the body.
+      await assertResolvesPublic(u.href);
       const res = await fetch(`https://${u.host}${u.pathname}`, {
         method: "HEAD",
         headers: { "User-Agent": UA },

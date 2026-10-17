@@ -90,7 +90,8 @@ stay collapsed. All CSS is inlined and nothing is fetched, so it works offline.
 
 Chrome is auto-detected on macOS, Linux, and Windows. Set `CHROME_PATH` if yours
 lives somewhere unusual. Lighthouse itself is fetched on demand via `npx` on
-first use — no install step, but the first run is slower.
+first use — no install step, but the first run is slower. The version is pinned
+(`lighthouse@13.5.0`), so every run executes the same tested release.
 
 ## Quick start
 
@@ -220,7 +221,10 @@ bug report) is welcome.
 ### Protocol support
 
 - stdio transport (no HTTP — see [Security](#security))
-- Tools annotated `readOnlyHint`, since audits never mutate the target site
+- Accurate tool annotations: the single checks are `readOnlyHint`; the two
+  report tools (`seo_full_audit`, `crawl_audit`) can write an HTML file and a
+  baseline, so they are `readOnlyHint: false, destructiveHint: false`. None of
+  them ever modifies the audited site
 - Tool failures return `isError: true` results rather than protocol errors, so
   the model can read and react to them
 - **Progress notifications** for long operations: pass a `progressToken` and
@@ -375,6 +379,7 @@ set variables in the client config:
 | `SEO_MCP_CRAWL_MAX_PAGES`       | `100`      | Hard ceiling on `max_pages` (1–1000)                                     |
 | `SEO_MCP_CRAWL_CONCURRENCY`     | `1`        | Parallel page fetches during a crawl (1–8). Raise only for sites you own |
 | `SEO_MCP_LIGHTHOUSE_TIMEOUT_MS` | `180000`   | Lighthouse run timeout (30000–600000)                                    |
+| `SEO_MCP_LIGHTHOUSE_VERSION`    | `13.5.0`   | Exact Lighthouse version run via `npx` (ranges and tags are refused)     |
 | `SEO_MCP_STATE_DIR`             | OS default | Where baselines are stored                                               |
 | `SEO_MCP_ALLOW_PRIVATE_HOSTS`   | `true`     | Allow auditing localhost / private IPs — see [Security](#security)       |
 | `CHROME_PATH`                   | auto       | Chrome binary for Lighthouse                                             |
@@ -457,7 +462,7 @@ Not commitments — ideas, roughly in priority order.
 
 ### Later
 
-- DNS-rebinding protection (resolve and pin the address before connecting)
+- Full DNS-rebinding protection (pin the resolved address for the connection)
 - Configurable crawl concurrency with per-host rate limiting
 - MCP resources for browsing saved baselines
 - MCP prompts for common workflows ("pre-launch checklist", "fix my Core Web Vitals")
@@ -503,7 +508,8 @@ Two things to know:
 - **If you expose this to input you don't control, set
   `SEO_MCP_ALLOW_PRIVATE_HOSTS=false`.** That enables SSRF protection, blocking
   private, loopback, and link-local targets — including the
-  `169.254.169.254` cloud-metadata address — and re-checking every redirect hop.
+  `169.254.169.254` cloud-metadata address — re-checking every redirect hop and
+  the addresses each hostname resolves to.
 
 Full threat model, known limitations, and a hardening checklist:
 [SECURITY.md](SECURITY.md).

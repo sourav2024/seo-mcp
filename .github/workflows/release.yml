@@ -1,0 +1,52 @@
+name: Release
+
+# Push a tag like v1.2.0 to publish. See docs/releasing.md.
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write # create the GitHub release
+      id-token: write # npm provenance
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Tag, package.json and server.json versions agree
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG=$(node -p 'require("./package.json").version')
+          SRV=$(node -p 'require("./server.json").version')
+          SRV_PKG=$(node -p 'require("./server.json").packages[0].version')
+          echo "tag=$TAG package.json=$PKG server.json=$SRV server.json packages[0]=$SRV_PKG"
+          test "$TAG" = "$PKG" && test "$TAG" = "$SRV" && test "$TAG" = "$SRV_PKG"
+
+      - run: npm ci
+      - run: npm run verify
+
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: GitHub release from the changelog entry
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" { on = 1; next }
+            on && /^## \[/ { exit }
+            on { print }
+          ' CHANGELOG.md > release-notes.md
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file release-notes.md

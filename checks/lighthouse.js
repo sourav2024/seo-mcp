@@ -2,7 +2,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { existsSync } from "node:fs";
 import { pass, warn, fail } from "./helpers.js";
-import { assertFetchableUrl } from "../src/url-guard.js";
+import { assertFetchableUrl, assertResolvesPublic } from "../src/url-guard.js";
 import { config } from "../src/config.js";
 import { log } from "../src/logger.js";
 
@@ -84,11 +84,14 @@ export async function runLighthouse(url, formFactor, { signal } = {}) {
   }
   // Validate before spawning: this string becomes a child-process argument.
   const target = assertFetchableUrl(url, { context: "Lighthouse URL" }).href;
+  // Chrome does its own DNS and follows redirects itself, so this is a pre-check
+  // on the starting host only — see SECURITY.md.
+  await assertResolvesPublic(target, { context: "Lighthouse URL" });
   const { command, prefix } = npxCommand();
   const args = [
     ...prefix,
     "-y",
-    "lighthouse",
+    `lighthouse@${config.lighthouseVersion}`,
     target,
     "--only-categories=performance,seo",
     "--chrome-flags=--headless=new",
@@ -98,7 +101,7 @@ export async function runLighthouse(url, formFactor, { signal } = {}) {
   if (formFactor === "desktop") args.push("--preset=desktop");
 
   const done = log.timer();
-  log.debug("Running Lighthouse", { url: target, formFactor, chrome });
+  log.debug("Running Lighthouse", { url: target, formFactor, chrome, version: config.lighthouseVersion });
   const { stdout } = await execFileAsync(command, args, {
     timeout: config.lighthouseTimeoutMs,
     maxBuffer: LIGHTHOUSE_MAX_BUFFER,

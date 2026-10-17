@@ -10,6 +10,7 @@ import {
   isPrivateHost,
   assertFetchableUrl,
   assertRedirectTarget,
+  assertResolvesPublic,
   parseUrlOrThrow,
   UrlValidationError,
 } from "../src/url-guard.js";
@@ -125,6 +126,8 @@ test("loopback, private, and link-local addresses are detected", () => {
     "fd00::1", // unique-local
     "fe80::1", // link-local
     "::ffff:127.0.0.1", // IPv4-mapped loopback
+    "::ffff:7f00:1", // the same, in the hex form the URL parser produces
+    "[::ffff:a9fe:a9fe]", // IPv4-mapped 169.254.169.254 (cloud metadata)
   ];
   for (const h of privateHosts) assert.equal(isPrivateHost(h), true, `${h} should be private`);
 });
@@ -147,6 +150,69 @@ test("private hosts are allowed by default (auditing localhost is a core use cas
   // config.allowPrivateHosts defaults to true, so this must not throw.
   assert.ok(assertFetchableUrl("http://localhost:3000"));
   assert.ok(assertFetchableUrl("http://127.0.0.1:8080/page"));
+});
+
+test("a bracketed IPv4-mapped URL is recognized after the parser rewrites it to hex", () => {
+  // new URL("http://[::ffff:127.0.0.1]/").hostname === "[::ffff:7f00:1]"
+  assert.equal(isPrivateHost(new URL("http://[::ffff:127.0.0.1]/").hostname), true);
+  assert.equal(isPrivateHost(new URL("http://[::ffff:8.8.8.8]/").hostname), false);
+});
+
+/* ---------------- Resolved-address guard ---------------- */
+
+/** A fake dns.promises.lookup returning fixed addresses. */
+const lookupReturning =
+  (...addresses) =>
+  async () =>
+    addresses.map((address) => ({ address, family: address.includes(":") ? 6 : 4 }));
+
+test("a public hostname resolving to a private address is blocked", async () => {
+  for (const addr of ["127.0.0.1", "169.254.169.254", "10.1.2.3", "::1", "::ffff:127.0.0.1"]) {
+    await assert.rejects(
+      assertResolvesPublic("https://rebind.example.com/", { allowPrivate: false, lookup: lookupReturning(addr) }),
+      UrlValidationError,
+      `${addr} should be blocked`
+    );
+  }
+});
+
+test("one private address among several is enough to block", async () => {
+  await assert.rejects(
+    assertResolvesPublic("https://mixed.example.com/", {
+      allowPrivate: false,
+      lookup: lookupReturning("93.184.216.34", "127.0.0.1"),
+    }),
+    /resolves to a private address \(127\.0\.0\.1\)/
+  );
+});
+
+test("public resolutions pass", async () => {
+  await assertResolvesPublic("https://example.com/", {
+    allowPrivate: false,
+    lookup: lookupReturning("93.184.216.34", "2606:2800:220:1::1"),
+  });
+});
+
+test("the resolved-address check is skipped entirely while private hosts are allowed", async () => {
+  let called = false;
+  await assertResolvesPublic("https://example.com/", {
+    allowPrivate: true,
+    lookup: async () => {
+      called = true;
+      return [];
+    },
+  });
+  assert.equal(called, false, "no DNS lookup should happen in the default mode");
+});
+
+test("IP literals and unresolvable hosts are left to the other guards", async () => {
+  const neverCalled = async () => assert.fail("lookup should not run for an IP literal");
+  await assertResolvesPublic("http://93.184.216.34/", { allowPrivate: false, lookup: neverCalled });
+  await assertResolvesPublic("http://[2606:2800:220:1::1]/", { allowPrivate: false, lookup: neverCalled });
+  const failing = async () => {
+    throw Object.assign(new Error("getaddrinfo ENOTFOUND"), { code: "ENOTFOUND" });
+  };
+  await assertResolvesPublic("https://no-such-host.invalid/", { allowPrivate: false, lookup: failing });
 });
 
 /* ---------------- Redirect guards ---------------- */

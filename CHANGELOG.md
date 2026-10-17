@@ -9,6 +9,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Nothing yet._
 
+## [1.2.0] — 2026-10-17
+
+### Security
+
+- **Resolved addresses are now checked, not just hostnames.** With
+  `SEO_MCP_ALLOW_PRIVATE_HOSTS=false`, a public hostname whose DNS points at
+  `127.0.0.1` or `169.254.169.254` used to pass the private-host guard. Every
+  hostname is now resolved before each request and each redirect hop, and is
+  rejected if any address is private. The default mode (private hosts allowed)
+  does no extra DNS work. A TTL-0 rebinding race remains — see SECURITY.md.
+- **IPv4-mapped IPv6 in hex form is recognized as private.** The URL parser
+  rewrites `http://[::ffff:127.0.0.1]/` to `[::ffff:7f00:1]`, which slipped past
+  the dotted-form check.
+- **Lighthouse is pinned** to `lighthouse@13.5.0` instead of whatever `npx`
+  resolves as latest, so a newly published release never runs untested.
+  Override with an exact version via the new `SEO_MCP_LIGHTHOUSE_VERSION`;
+  ranges, tags, and git/URL specs are refused.
+- **`output_path` no longer overwrites arbitrary files.** An existing file is
+  only replaced when it is an earlier seo-mcp report; pointing it at a project's
+  `index.html` now returns an error and leaves the file untouched.
+- Dependencies bumped (`@modelcontextprotocol/sdk` 1.32.1, `zod` 4.6.7), clearing
+  every `npm audit` advisory in the production tree.
+
+### Changed
+
+- `seo_full_audit` and `crawl_audit` now declare `readOnlyHint: false,
+  destructiveHint: false`. They can write an HTML report and a baseline, so the
+  previous `readOnlyHint: true` was inaccurate. The single checks stay read-only.
+
+### Fixed
+
+- `npm test` now runs on Node 20, the declared `engines` floor. Glob arguments
+  to `node --test` require Node 21+, and two crawl tests used top-level `await`
+  in `node -e`, which Node 20 only accepts with `--input-type=module`.
+- The CI and release workflows referenced by the README badge and
+  `docs/releasing.md` are now in the repository. CI runs lint, tests, the MCP
+  smoke test, and a production `npm audit` on Node 20.10, 22, and 24 (plus
+  macOS).
+
 ## [1.1.0] — 2026-08-08
 
 ### Added
@@ -220,6 +259,7 @@ inputs keep working until the next major version — `check_keyword_placement`'s
 singular `keyword` parameter is an example of a shape kept for compatibility
 alongside the preferred `keywords` array.
 
-[Unreleased]: https://github.com/sourav2024/seo-mcp/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/sourav2024/seo-mcp/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/sourav2024/seo-mcp/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/sourav2024/seo-mcp/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/sourav2024/seo-mcp/releases/tag/v1.0.0

@@ -2,7 +2,13 @@
 import { config } from "../src/config.js";
 import { log } from "../src/logger.js";
 import { VERSION } from "../src/version.js";
-import { assertFetchableUrl, assertRedirectTarget, normalizeUrl, parseUrlOrThrow } from "../src/url-guard.js";
+import {
+  assertFetchableUrl,
+  assertRedirectTarget,
+  assertResolvesPublic,
+  normalizeUrl,
+  parseUrlOrThrow,
+} from "../src/url-guard.js";
 
 export { VERSION };
 export { normalizeUrl, parseUrlOrThrow };
@@ -64,7 +70,8 @@ export async function readCapped(res, { maxBytes = config.maxBodyBytes } = {}) {
  *
  * Redirects are followed manually (redirect: "manual") rather than by the
  * platform so every hop passes through assertRedirectTarget — otherwise a
- * public URL could redirect into a private range unchecked.
+ * public URL could redirect into a private range unchecked. Each hop's resolved
+ * addresses are checked too, when private hosts are blocked.
  */
 export async function fetchPage(
   url,
@@ -74,6 +81,7 @@ export async function fetchPage(
   const done = log.timer();
 
   for (let hop = 0; hop <= maxHops; hop++) {
+    await assertResolvesPublic(current);
     const res = await fetch(current, {
       headers: { ...FETCH_HEADERS, ...headers },
       method,
@@ -239,6 +247,7 @@ export async function fetchWithChain(url, maxHops = config.maxRedirectHops) {
     }
     seen.add(current);
 
+    await assertResolvesPublic(current);
     const res = await fetch(current, {
       headers: FETCH_HEADERS,
       redirect: "manual",

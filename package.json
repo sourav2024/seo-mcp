@@ -1,6 +1,6 @@
 {
   "name": "technical-seo-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "MCP server for technical & on-page SEO audits — crawlability, HTTPS, Core Web Vitals, sitemap, robots.txt, structured data, and AI-crawler access. Reports as Markdown, JSON, or a shareable HTML file.",
   "type": "module",
   "bin": {
@@ -33,9 +33,9 @@
   ],
   "scripts": {
     "start": "node server.js",
-    "test": "node --test \"test/**/*.test.js\"",
-    "test:watch": "node --test --watch \"test/**/*.test.js\"",
-    "test:coverage": "node --test --experimental-test-coverage \"test/**/*.test.js\"",
+    "test": "node --test",
+    "test:watch": "node --test --watch",
+    "test:coverage": "node --test --experimental-test-coverage",
     "lint": "prettier --check . && markdownlint-cli2",
     "format": "prettier --write .",
     "build": "echo \"No build step — plain ESM, runs directly on Node 20+\" && node --check server.js",
@@ -43,7 +43,8 @@
     "smoke": "node scripts/smoke.js",
     "prepublishOnly": "npm run check:placeholders && npm test",
     "lint:md": "markdownlint-cli2",
-    "check:placeholders": "node scripts/check-placeholders.js"
+    "check:placeholders": "node scripts/check-placeholders.js",
+    "skill:zip": "rm -f dist/technical-seo-audit.zip && mkdir -p dist && cd skill/technical-seo-audit && zip -qrX ../../dist/technical-seo-audit.zip . -x '.*' && cd ../.. && unzip -l dist/technical-seo-audit.zip"
   },
   "keywords": [
     "mcp",
@@ -83,11 +84,11 @@
     "url": "https://github.com/sponsors/sourav2024"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
-    "zod": "^4.4.3"
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "markdownlint-cli2": "^0.23.1",
-    "prettier": "^3.4.2"
+    "markdownlint-cli2": "^0.23.3",
+    "prettier": "^3.9.10"
   }
 }

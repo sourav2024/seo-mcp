@@ -5,7 +5,7 @@
 import "./helpers/env.js";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, existsSync } from "node:fs";
+import { mkdtempSync, readFileSync, existsSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
@@ -195,4 +195,25 @@ test("unwritable baseline dir surfaces a warning but does not throw", () => {
   const res = diffAgainstBaseline("https://example.com", parseReport(SAMPLE), { dir });
   assert.ok(res.writeError, "should record a write error");
   assert.match(diffToMarkdown(res), /Baseline could not be saved/);
+});
+
+/* ---------------- Overwrite protection ---------------- */
+
+test("an existing file that is not an seo-mcp report is never overwritten", () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), "seo-mcp-overwrite-"));
+  const file = path.join(dir, "index.html");
+  const original = "<!doctype html><title>My real homepage</title>";
+  writeFileSync(file, original);
+  const result = finishReport("https://example.com", SAMPLE, { output: "html", output_path: file });
+  assert.match(result.content[0].text, /not an seo-mcp report/);
+  assert.equal(readFileSync(file, "utf8"), original, "the user's file must be untouched");
+});
+
+test("a previous seo-mcp report at the same path is replaced", () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), "seo-mcp-overwrite-"));
+  const file = path.join(dir, "report.html");
+  finishReport("https://example.com", SAMPLE, { output: "html", output_path: file });
+  const result = finishReport("https://example.org", SAMPLE, { output: "html", output_path: file });
+  assert.match(result.content[0].text, /HTML report written to/);
+  assert.match(readFileSync(file, "utf8"), /example\.org/);
 });

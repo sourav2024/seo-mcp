@@ -8,7 +8,7 @@
  * "Self-contained" is load-bearing: inlined CSS, no external fonts/scripts/images,
  * so the file works offline, over file://, and when emailed to a client.
  */
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { VERSION, HOMEPAGE } from "../src/version.js";
@@ -108,6 +108,23 @@ footer a{color:inherit}
 `;
 
 /**
+ * Marks a file as one of our reports. writeHtmlReport only overwrites files that
+ * carry it, so an output_path pointing at a real page (a project's index.html)
+ * is refused instead of silently replaced.
+ */
+const GENERATOR = "seo-mcp";
+
+/** True when `file` is missing or is a report this server wrote earlier. */
+export function isSafeToWrite(file) {
+  if (!existsSync(file)) return true;
+  try {
+    return readFileSync(file, "utf8").slice(0, 1024).includes(`<meta name="generator" content="${GENERATOR}">`);
+  } catch {
+    return false; // a directory or unreadable file: never overwrite
+  }
+}
+
+/**
  * Build the full HTML document from parsed sections.
  * @param {string} target  audited URL (or "crawl:<url>")
  * @param {Array}  sections output of parseReport()
@@ -122,6 +139,7 @@ export function renderHtmlReport(target, sections, counts, generatedAt) {
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="generator" content="${GENERATOR}">
 <title>${escapeHtml(title)}</title>
 <style>${STYLES}</style></head>
 <body><div class="wrap">
@@ -198,6 +216,8 @@ export function writeHtmlReport(target, sections, counts, outputPath) {
   const generatedAt = now.toISOString().replace("T", " ").slice(0, 16) + " UTC";
   const file = resolveReportPath(target, outputPath, now.toISOString().slice(0, 10));
   const html = renderHtmlReport(target, sections, counts, generatedAt);
+  if (!isSafeToWrite(file))
+    return `❌ Not writing the HTML report: ${file} already exists and is not an seo-mcp report, so it was left untouched. Pass an output_path to a new file or a directory.`;
   try {
     // Create the destination if needed: output_path may name a directory that
     // does not exist yet, which is a reasonable thing for a caller to ask for.
