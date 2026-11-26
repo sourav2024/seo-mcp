@@ -542,3 +542,7 @@ bug report, or telling me which check produced a false positive on your site.
 - Google's [Search Central documentation](https://developers.google.com/search/docs)
   and the [schema.org](https://schema.org) vocabulary, which define what most of
   these checks are checking against
+
+## Design notes
+
+Architecture diagram, request flow, design trade-offs and known limitations: [docs/DESIGN-NOTES.md](docs/DESIGN-NOTES.md).
